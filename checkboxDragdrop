@@ -1,0 +1,262 @@
+<html>
+<head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstree@3.3.5/dist/jstree.js"></script>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+      -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+body{
+  width:100%;
+}
+section{
+ 
+}
+#jstree{
+  /* Ensure tree and red box do not overlap to help show issue at hand */
+  width: 50%;
+}
+section{
+  width:90%;
+  margin:0 auto;
+  display:flex;
+  flex-direction:row-reverse;
+}
+ 
+.DropBox{
+  width:100%;
+  border:2px solid;
+ 
+}
+.topbar{
+  padding:13px 0px;
+  width:100%;
+  background:blue;
+  text-align:center;
+}
+.plus{
+  padding:5px 10px;
+  font-size:20px;
+  background:green;
+  border-radius:50%;
+}
+.number{
+  padding:5px 5px;
+  height:inherit;
+  text-align:center;
+  font-size:20px;
+  font-weight:bolder;
+}
+ 
+.item{
+  width:100%;
+  min-height:0px;
+  max-height:inherit;
+  background:rgba(0,0,0,.4);
+  padding:10px 10px;
+}
+/* .item ul{
+} */
+li{
+  box-sizing:border-box;
+  list-style:none;
+   margin:15px 10px 0px 10px;
+   background:rgba(225,225,225,.5);
+   padding:5px 20px;
+   position:relative;
+   transition:all 0.3s;
+  padding-bottom:20px;
+}
+li .close{
+  cursor:pointer;
+  position:absolute;
+  top:-10px;
+  right:-10px;
+  background:red;
+  float:right;
+  font-size:19px;
+  font-weight:bolder;
+  padding:2px 7px;
+  border-radius:50%;
+  transition:all 0.3s;
+}
+li:hover{
+  background:rgba(225,225,225,.8);
+}
+li .close:hover{
+  transform:scale(1.1);
+  color:#ffffff;
+  background-color:#D50000;
+}
+.num{
+  font-weight:bolder;
+  font-size:15px;
+}
+.drop{
+  position:relative;
+  display:inline-block;
+  background:#1976D2;
+  margin:0 calc(50% - 20px);
+  font-weight:bolder;
+  font-size:40px;
+  color:#ffffff;
+  padding:0px 12px;
+  border-radius:50%;
+  border: double 10px rgba(3, 161, 252,1);
+  transition:all 0.5s;
+  margin-bottom:20px;
+  animation:animate 2s infinite ease-in-out;
+  border:8px dashed linear-gradient(#1976D2,transparent);
+}
+@keyframes animate{
+  0%{
+    box-shadow:0px 0px 10px 25px rgba(3, 161, 252,.2),
+               0px 0px 10px 10px rgba(3, 161, 252,0.4),
+               0px 0px 10px 5px rgba(3, 161, 252,1);
+  }
+  100%{
+    box-shadow:0px 0px 10px 15px rgba(3, 161, 252,.2),
+               0px 0px 10px 5px rgba(3, 161, 252,0.7),
+               0px 0px 10px 0px rgba(3, 161, 252,1);
+   }
+}
+@media(max-width:486px){
+  section{
+    flex-direction:column-reverse;
+  }
+}
+</style>
+ 
+</head>
+<body>
+ 
+<section>
+<div class="DropBox">
+  <div class="topbar">
+    <input type="text" class="number" value="0" readonly="true">
+  </div>
+  <div class="item box">
+    <span class="drop">&plus;</span>
+  </div>
+</div>
+<div id="jstree"></div>
+</section>
+ 
+<script>
+$(document).ready(()=>{
+var dragged;
+ 
+$("#jstree").jstree({
+  core: {
+    data: [
+      "Drag me",
+      {
+        text: "Node A",
+        children: ["1", "2"]
+      },
+      {
+        text: "Node B",
+        children: ["1", "2"]
+      },
+      {
+        text: "Node C",
+        children: ["1", "2"]
+      },
+      {
+        text: "Drag me directly onto box",
+        children: ["1", "2"]
+      },
+      {
+        text: "Node E",
+        children: ["1", "2"]
+      }
+    ],
+    check_callback: function(
+      operation,
+      node,
+      node_parent,
+      node_position,
+      more
+    ) {
+      return more.pos === "i";
+    }
+  },
+  plugins: ["dnd"],
+  dnd: {
+    check_while_dragging: true,
+    use_html5: true,
+    open_timeout: 750,
+    large_drop_target: true, // Comment out to see behavior change
+    touch: "selected"
+  }
+});
+ 
+$(document).on("dnd_start.vakata.jstree", function(event, data) {
+  dragged = data.data.obj.text();
+});
+ 
+$(".box").on("dragover", function(event) {
+  // Make the box appear as though things can be dropped onto it.
+  event.preventDefault();
+  event.originalEvent.dataTransfer.dropEffect = "copy";
+  if(event){
+   $(".drop").css("backgroundColor","rgba(3, 161, 252,1)")
+    setTimeout(()=>{
+       $(".drop").css("backgroundColor","rgb(25, 118, 210)")
+     },500)
+  }
+});
+ 
+// let ul = document.createElement("ul")
+ let text = document.querySelector(".box");
+//  text.appendChild(ul)
+let number=0;
+ 
+// $(".box").on("drop", function(event) {
+//   number++;
+//    text.innerHTML +=`<li>${number}. You Dropped ${dragged}<span class="close">&times;</span></li>`;
+ 
+// });
+ $(".box").on("drop", function(event) {
+  number++;
+   text.innerHTML +=`<li><span class="num list_${number}">${number}.</span> You Dropped ${dragged}<span class="close">&times;</span></li>`;
+    $('.close').on('click', function(e){
+    $(this).parent('li').fadeOut(()=>{
+      e.preventDefault();
+      $(this).remove();
+      number--;
+       $(".number").val(`${number}`);
+    });  
+  })
+ $(".number").val(`${number}`);
+});
+// $(document).on("click",".close",function(){
+//   $(this).parent().fadeOut(()=>{
+//     $(this).remove();
+//   });
+//    number--;
+// })
+ 
+ let value =  Number($(".number").val())
+$(".plus").click(()=>{
+  console.log(value+=1);
+ 
+})
+ 
+  function increment(){
+   value  += 1;
+  }
+})
+</script>
+</body>
+</html>
